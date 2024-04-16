@@ -1,11 +1,29 @@
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.util.*;
+import java.awt.BorderLayout;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JSlider;
 
 
 public class TopicModelerGUI extends JFrame {
+	
+	private File Stopwords;
+	private List<String> words;
+	private List<String> stopwords;
+	int score = 0;
+	
     private JPanel homeScreen, mainScreen, settingsScreen;
     private JButton beginButton, fileButton1, fileButton2, compareButton, resetButton, homeButton, settingsButton, backButton;
     private JLabel descriptionLabel, label1, label2, settingsLabel;
@@ -38,7 +56,7 @@ public class TopicModelerGUI extends JFrame {
         fileButton2 = new JButton("Choose File 2");
         fileButton2.addActionListener(new FileButtonListener2());
         compareButton = new JButton("Compare");
-        //compareButton.addActionListener(new CompareButtonListener());
+        compareButton.addActionListener(new CompareButtonListener());
         resetButton = new JButton("Reset");
         resetButton.addActionListener(new ResetButtonListener());
         homeButton = new JButton("Home");
@@ -109,6 +127,7 @@ public class TopicModelerGUI extends JFrame {
             if (returnValue == JFileChooser.APPROVE_OPTION) {
                 selectedFile1 = fileChooser.getSelectedFile();
                 label1.setText("File 1: " + selectedFile1.getName());
+                
             }
         }
     }
@@ -125,7 +144,7 @@ public class TopicModelerGUI extends JFrame {
         }
     }
 
-    /*// Action listener for "Compare" button
+    // Action listener for "Compare" button
     private class CompareButtonListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             if (selectedFile1 == null || selectedFile2 == null) {
@@ -133,17 +152,14 @@ public class TopicModelerGUI extends JFrame {
                 return;
             }
 
-            // Read contents of selected files
-            String text1 = readFile(selectedFile1);
-            String text2 = readFile(selectedFile2);
-
-            // Calculate similarity
-            double similarity = calculateSimilarity(text1, text2);
-
-            // Display similarity
-            JOptionPane.showMessageDialog(null, "Similarity: " + similarity);
+            // Call algorithm to calculate the score
+            int score = algorithm(selectedFile1.getAbsolutePath(), selectedFile2.getAbsolutePath());
+            System.out.println("Score: " + score);
+            
+            JOptionPane.showMessageDialog(null, "Similarity Score: " + score);
+            score = 0;
         }
-    } */
+    } 
 
     // Action listener for "Reset" button
     private class ResetButtonListener implements ActionListener {
@@ -184,5 +200,66 @@ public class TopicModelerGUI extends JFrame {
             repaint();
         }
     }
+    
+    public int algorithm(String file1, String file2) {
+        List<String> processedFile1 = file_processor(file1);
+        List<String> processedFile2 = file_processor(file2);
+        
+        // Compare the processed files
+        for (String word1 : processedFile1) {
+            for (String word2 : processedFile2) {
+                if (word2.equals(word1)) {
+                    score += 1;   // add better score calculator..............................................
+                }
+            }
+        }
+        
+        return score;
+    }
+    
+    public List<String> file_processor(String filename) {
+		 File file = new File(filename);
+		this.Stopwords = new File("StopWords.txt");
+		this.words = new ArrayList<>();
+		this.stopwords = new ArrayList<>();
+		try {
+			Scanner scan = new Scanner(file);
+			Scanner scanStopwords = new Scanner(Stopwords);
+			while (scanStopwords.hasNextLine()) {
+				String stopword = scanStopwords.nextLine().trim().toLowerCase();
+				stopwords.add(stopword);
+			}
+			while(scan.hasNextLine()) {
+				String line = scan.nextLine();
+				String[] lineToWords = line.split("\\s+");
+				for(String word : lineToWords) {
+					word = word.toLowerCase();
+					word = word.replaceAll("[^a-zA-Z0-9]+", "");
+					boolean isStopword = false;
+					for(String stopword : stopwords) {
+						if(word.equals(stopword)) {
+							isStopword = true;
+							break;
+						}
+					}
+					if(!isStopword) {
+						words.add(word);				
+					}
+				}
+			}
+			scan.close();
+			scanStopwords.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return words;
+	} 
+    
+    public List<String> getWords(){
+		return words;
+	}
+	public File getStopwords() {
+		return Stopwords;
+	}
 
 }
