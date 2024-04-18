@@ -4,9 +4,15 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -17,7 +23,7 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 
 
-public class TopicModelerGUI extends JFrame {
+public class bo extends JFrame {
 	
 	private File Stopwords;
 	private List<String> words;
@@ -30,7 +36,7 @@ public class TopicModelerGUI extends JFrame {
     private File selectedFile1, selectedFile2;
     private JSlider slider;
 
-    public TopicModelerGUI() {
+    public bo() {
         setTitle("Topic Modeler");
         setSize(600, 400);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -83,6 +89,9 @@ public class TopicModelerGUI extends JFrame {
         slider.setPaintTrack(true);
         slider.setMajorTickSpacing(5);
         slider.setPaintLabels(true);
+        slider.addChangeListener(e -> {
+            int value = slider.getValue();
+        });
         backButton = new JButton("Back");
         backButton.addActionListener(new BackButtonListener());
         settingsScreen.add(settingsLabel, BorderLayout.NORTH);
@@ -153,11 +162,10 @@ public class TopicModelerGUI extends JFrame {
             }
 
             // Call algorithm to calculate the score
-            int score = algorithm(selectedFile1.getAbsolutePath(), selectedFile2.getAbsolutePath());
+            int score = scoreAlgorithm(selectedFile1.getAbsolutePath(), selectedFile2.getAbsolutePath());
             System.out.println("Score: " + score);
             
             JOptionPane.showMessageDialog(null, "Similarity Score: " + score);
-            score = 0;
         }
     } 
 
@@ -201,16 +209,58 @@ public class TopicModelerGUI extends JFrame {
         }
     }
     
-    public int algorithm(String file1, String file2) {
+    public int scoreAlgorithm(String file1, String file2) {
         List<String> processedFile1 = file_processor(file1);
         List<String> processedFile2 = file_processor(file2);
+        score = 0; //resets score
+
+        // Find the top most common words in each file
+        Map<String, Integer> topWordsFile1 = findTopWords(processedFile1);
+        Map<String, Integer> topWordsFile2 = findTopWords(processedFile2);
         
-        // Compare the processed files
-        for (String word1 : processedFile1) {
-            for (String word2 : processedFile2) {
-                if (word2.equals(word1)) {
-                    score += 1;   // add better score calculator..............................................
-                }
+        // Compare the sets of top most common words and calculate score.
+        int score = compareTopWords(topWordsFile1, topWordsFile2);
+        
+        return score;
+    }
+    
+    private Map<String, Integer> findTopWords(List<String> words) {
+        Map<String, Integer> wordFrequency = new HashMap<>();
+        
+        // Count the frequency of each word
+        for (String word : words) {
+            wordFrequency.put(word, wordFrequency.getOrDefault(word, 0) + 1);
+        }
+        
+        // Sort the map by values (word frequencies) in descending order
+        Map<String, Integer> sortedWordFrequency = wordFrequency.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+                        (oldValue, newValue) -> oldValue, LinkedHashMap::new));
+        
+        // Extract the top most common words
+        Map<String, Integer> topWords = new LinkedHashMap<>();
+        int count = 0;
+        int topCommonWords = slider.getValue();
+        for (Map.Entry<String, Integer> entry : sortedWordFrequency.entrySet()) {
+            if (count >= topCommonWords) {
+                break;
+            }
+            topWords.put(entry.getKey(), entry.getValue());
+            count++;
+        }
+        
+        return topWords;
+    }
+
+    private int compareTopWords(Map<String, Integer> topWordsFile1, Map<String, Integer> topWordsFile2) {
+        int score = 0;
+        
+        // Compare the sets of top 10 words and calculate score
+        for (Map.Entry<String, Integer> entry : topWordsFile1.entrySet()) {
+            if (topWordsFile2.containsKey(entry.getKey())) {
+                score++; // Increment score if the word is present in both sets
             }
         }
         
