@@ -100,6 +100,7 @@ public class TopicModelerGUI extends JFrame {
         homeButton.addActionListener(new HomeButtonListener());
         homeButton.setFocusable(false);
         
+        // settings
         settingsButton = new JButton("   ⚙️");
         Font buttonFont4 = settingsButton.getFont();
         settingsButton.setFont(buttonFont4.deriveFont(buttonFont4.getSize() + 50f));
