@@ -23,7 +23,7 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 
 
-public class bo extends JFrame {
+public class TopicModelerGUI extends JFrame {
 	
 	private File Stopwords;
 	private List<String> words;
@@ -36,7 +36,7 @@ public class bo extends JFrame {
     private File selectedFile1, selectedFile2;
     private JSlider slider;
 
-    public bo() {
+    public TopicModelerGUI() {
         setTitle("Topic Modeler");
         setSize(600, 400);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
