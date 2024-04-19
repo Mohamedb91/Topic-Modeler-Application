@@ -1,10 +1,10 @@
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -41,13 +41,17 @@ public class TopicModelerGUI extends JFrame {
         setSize(600, 400);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-        //Create home screen 
+      //Create home screen 
         homeScreen = new JPanel();
         homeScreen.setLayout(new BorderLayout());
-        descriptionLabel = new JLabel("Welcome to the Topic Modeler program. This program compares the similarity between two text files.");
+        descriptionLabel = new JLabel("<html><div style='text-align: center; font-size: 30pt; display: table-cell; vertical-align: middle;'>Welcome to Topic Modeler!</div><br>"
+                + "<div style='text-align: center; font-size: 15pt;'>This program compares the similarity between two text files,<br>Simply choose your files then press the compare button to see the result.</div><br><br>"
+                + "<div style='text-align: center; font-size: 15pt;'>Authors: Cillian, Mo, Noor, Walid.</div></html>");
         descriptionLabel.setHorizontalAlignment(JLabel.CENTER);
         beginButton = new JButton("Begin");
         beginButton.addActionListener(new BeginButtonListener());
+        beginButton.setBackground(Color.GREEN);
+        beginButton.setFocusable(false);
         homeScreen.add(descriptionLabel, BorderLayout.CENTER);
         homeScreen.add(beginButton, BorderLayout.SOUTH);
 
@@ -55,20 +59,51 @@ public class TopicModelerGUI extends JFrame {
         mainScreen = new JPanel();
         mainScreen.setLayout(new BorderLayout());
    
-
         // Initialize GUI components for main screen
-        fileButton1 = new JButton("Choose File 1");
+        fileButton1 = new JButton("📄1");
+        //change font size
+        Font buttonFont5 = fileButton1.getFont();
+        fileButton1.setFont(buttonFont5.deriveFont(buttonFont5.getSize() + 50f));
+        //colour
+        fileButton1.setBackground(Color.WHITE);
         fileButton1.addActionListener(new FileButtonListener1());
-        fileButton2 = new JButton("Choose File 2");
+        fileButton1.setFocusable(false);
+        fileButton2 = new JButton("📄2");
+        Font buttonFont6 = fileButton2.getFont();
+        fileButton2.setFont(buttonFont6.deriveFont(buttonFont6.getSize() + 50f));
+        fileButton2.setBackground(Color.WHITE);
         fileButton2.addActionListener(new FileButtonListener2());
-        compareButton = new JButton("Compare");
+        fileButton2.setFocusable(false);
+        
+        compareButton = new JButton("🔍");
+        Font buttonFont1 = compareButton.getFont();
+        compareButton.setFont(buttonFont1.deriveFont(buttonFont1.getSize() + 50f));
+        compareButton.setBackground(Color.WHITE);
         compareButton.addActionListener(new CompareButtonListener());
-        resetButton = new JButton("Reset");
+        compareButton.setFocusable(false);
+        
+        resetButton = new JButton("🗑️");
+        Font buttonFont2 = resetButton.getFont();
+        resetButton.setFont(buttonFont2.deriveFont(buttonFont2.getSize() + 50f));
+        resetButton.setBackground(Color.WHITE);
         resetButton.addActionListener(new ResetButtonListener());
-        homeButton = new JButton("Home");
+        resetButton.setFocusable(false);
+        
+        homeButton = new JButton("🏠");
+        Font buttonFont3 =homeButton.getFont();
+        homeButton.setFont(buttonFont3.deriveFont(buttonFont3.getSize() + 50f));
+        homeButton.setBackground(Color.WHITE);
         homeButton.addActionListener(new HomeButtonListener());
-        settingsButton = new JButton("Settings");
+        homeButton.setFocusable(false);
+        
+        settingsButton = new JButton("   ⚙️");
+        Font buttonFont4 = settingsButton.getFont();
+        settingsButton.setFont(buttonFont4.deriveFont(buttonFont4.getSize() + 50f));
+        
+        settingsButton.setBackground(Color.WHITE);
         settingsButton.addActionListener(new SettingsButtonListener());
+        settingsButton.setFocusable(false);
+        
         label1 = new JLabel("File 1: ");
         label2 = new JLabel("File 2: ");
         //Edit text size
@@ -76,11 +111,12 @@ public class TopicModelerGUI extends JFrame {
         Font newFont = currentFont.deriveFont(currentFont.getSize() + 4f);
         label1.setFont(newFont);
         label2.setFont(newFont);
-        
+
         //Create settings screen 
         settingsScreen = new JPanel();
         settingsScreen.setLayout(new BorderLayout());
-        settingsLabel = new JLabel("Welcome to Settings");
+        settingsLabel = new JLabel("<html><br><div style='text-align: center; font-size: 24pt; display: table-cell; vertical-align: middle;'>Welcome to Settings</div><br>"
+                + "<div style='text-align: center;'>Select the number of words you wish to search for</div><br>");
         settingsLabel.setHorizontalAlignment(JLabel.CENTER);
         //Create slider for settings
         slider = new JSlider(0,25,10);
@@ -90,14 +126,15 @@ public class TopicModelerGUI extends JFrame {
         slider.setMajorTickSpacing(5);
         slider.setPaintLabels(true);
         slider.addChangeListener(e -> {
-            int value = slider.getValue();
+        		slider.getValue();
         });
         backButton = new JButton("Back");
+        backButton.setBackground(Color.RED);
         backButton.addActionListener(new BackButtonListener());
+        backButton.setFocusable(false);
         settingsScreen.add(settingsLabel, BorderLayout.NORTH);
         settingsScreen.add(slider, BorderLayout.CENTER);
-        settingsScreen.add(backButton, BorderLayout.SOUTH);
-        
+        settingsScreen.add(backButton, BorderLayout.SOUTH);        
         
 
         JPanel filePanel = new JPanel();
@@ -127,7 +164,6 @@ public class TopicModelerGUI extends JFrame {
         }
     }
     
-
     // Action listener for "Choose File 1" button
     private class FileButtonListener1 implements ActionListener {
         public void actionPerformed(ActionEvent e) {
@@ -165,7 +201,7 @@ public class TopicModelerGUI extends JFrame {
             int score = scoreAlgorithm(selectedFile1.getAbsolutePath(), selectedFile2.getAbsolutePath());
             System.out.println("Score: " + score);
             
-            JOptionPane.showMessageDialog(null, "Similarity Score: " + score);
+            JOptionPane.showMessageDialog(null, "Similarity Score: " + score + "/" + slider.getValue());
         }
     } 
 

@@ -5,7 +5,7 @@ public class main {
 	public static void main(String[] args) {
 		
 		SwingUtilities.invokeLater(() -> {
-            	bo gui = new bo();
+			TopicModelerGUI gui = new TopicModelerGUI();
             	gui.setVisible(true);
        	        });
 		
