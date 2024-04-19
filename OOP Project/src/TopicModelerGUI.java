@@ -5,6 +5,9 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -15,6 +18,7 @@ import java.util.Scanner;
 import java.util.stream.Collectors;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -29,8 +33,7 @@ public class TopicModelerGUI extends JFrame {
 	private List<String> words;
 	private List<String> stopwords;
 	int score = 0;
-
-    //Gui components and buttons
+	
     private JPanel homeScreen, mainScreen, settingsScreen;
     private JButton beginButton, fileButton1, fileButton2, compareButton, resetButton, homeButton, settingsButton, backButton;
     private JLabel descriptionLabel, label1, label2, settingsLabel;
@@ -42,7 +45,7 @@ public class TopicModelerGUI extends JFrame {
         setSize(600, 400);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-      // Create home screen of GUI
+      //Create home screen 
         homeScreen = new JPanel();
         homeScreen.setLayout(new BorderLayout());
         descriptionLabel = new JLabel("<html><div style='text-align: center; font-size: 30pt; display: table-cell; vertical-align: middle;'>Welcome to Topic Modeler!</div><br>"
@@ -56,20 +59,16 @@ public class TopicModelerGUI extends JFrame {
         homeScreen.add(descriptionLabel, BorderLayout.CENTER);
         homeScreen.add(beginButton, BorderLayout.SOUTH);
 
-        //Create main screen of GUI
+        //Create main screen
         mainScreen = new JPanel();
         mainScreen.setLayout(new BorderLayout());
-
    
         // Initialize GUI components for main screen
         fileButton1 = new JButton("📄1");
-
-        //Changing font size 
+        //change font size
         Font buttonFont5 = fileButton1.getFont();
         fileButton1.setFont(buttonFont5.deriveFont(buttonFont5.getSize() + 50f));
-
-
-        //Setting the colour
+        //colour
         fileButton1.setBackground(Color.WHITE);
         fileButton1.addActionListener(new FileButtonListener1());
         fileButton1.setFocusable(false);
@@ -111,22 +110,18 @@ public class TopicModelerGUI extends JFrame {
         
         label1 = new JLabel("File 1: ");
         label2 = new JLabel("File 2: ");
-
-
-        //Editing the text Size making it more suitable
+        //Edit text size
         Font currentFont = label1.getFont();
         Font newFont = currentFont.deriveFont(currentFont.getSize() + 4f);
         label1.setFont(newFont);
         label2.setFont(newFont);
 
-        //Create settings for the screen on the GUI
+        //Create settings screen 
         settingsScreen = new JPanel();
         settingsScreen.setLayout(new BorderLayout());
         settingsLabel = new JLabel("<html><br><div style='text-align: center; font-size: 24pt; display: table-cell; vertical-align: middle;'>Welcome to Settings</div><br>"
                 + "<div style='text-align: center;'>Select the number of words you wish to search for</div><br>");
         settingsLabel.setHorizontalAlignment(JLabel.CENTER);
-
-
         //Create slider for settings
         slider = new JSlider(0,25,10);
         slider.setPaintTicks(true);
@@ -135,16 +130,14 @@ public class TopicModelerGUI extends JFrame {
         slider.setMajorTickSpacing(5);
         slider.setPaintLabels(true);
         slider.addChangeListener(e -> {
-        		slider.getValue();
-        });
+		slider.getValue();});
         backButton = new JButton("Back");
         backButton.setBackground(Color.RED);
         backButton.addActionListener(new BackButtonListener());
         backButton.setFocusable(false);
         settingsScreen.add(settingsLabel, BorderLayout.NORTH);
         settingsScreen.add(slider, BorderLayout.CENTER);
-        settingsScreen.add(backButton, BorderLayout.SOUTH);        
-        
+        settingsScreen.add(backButton, BorderLayout.SOUTH);
 
         JPanel filePanel = new JPanel();
         filePanel.setLayout(new GridLayout(4, 2));
@@ -158,7 +151,6 @@ public class TopicModelerGUI extends JFrame {
         filePanel.add(settingsButton);
 
         mainScreen.add(filePanel, BorderLayout.CENTER);
-
 
         // Initially display home screen
         getContentPane().add(homeScreen, BorderLayout.CENTER);
@@ -174,7 +166,7 @@ public class TopicModelerGUI extends JFrame {
         }
     }
     
-    // Action listener for "Choose File 1" button to choose a file
+    // Action listener for "Choose File 1" button
     private class FileButtonListener1 implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             JFileChooser fileChooser = new JFileChooser();
@@ -187,7 +179,7 @@ public class TopicModelerGUI extends JFrame {
         }
     }
 
-    // Action listener for "Choose File 2" button to choose another file
+    // Action listener for "Choose File 2" button
     private class FileButtonListener2 implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             JFileChooser fileChooser = new JFileChooser();
@@ -199,7 +191,7 @@ public class TopicModelerGUI extends JFrame {
         }
     }
 
-    // Action listener for "Compare" button to compare words between files
+    // Action listener for "Compare" button
     private class CompareButtonListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             if (selectedFile1 == null || selectedFile2 == null) {
@@ -211,7 +203,6 @@ public class TopicModelerGUI extends JFrame {
             int score = scoreAlgorithm(selectedFile1.getAbsolutePath(), selectedFile2.getAbsolutePath());
             System.out.println("Score: " + score);
             
-            // Displays the results
             JOptionPane.showMessageDialog(null, "Similarity Score: " + score + "/" + slider.getValue());
         }
     } 
@@ -226,7 +217,7 @@ public class TopicModelerGUI extends JFrame {
         }
     }
 
-    // Action listener for "Home" button which returns to home screen
+    // Action listener for "Home" button
     private class HomeButtonListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             getContentPane().removeAll(); // Remove current content
@@ -236,7 +227,7 @@ public class TopicModelerGUI extends JFrame {
         }
     }
     
-    // Action listener for "Settings" button which brings up setting menu
+    // Action listener for "Settings" button
     private class SettingsButtonListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             getContentPane().removeAll(); // Remove current content
@@ -259,11 +250,14 @@ public class TopicModelerGUI extends JFrame {
     public int scoreAlgorithm(String file1, String file2) {
         List<String> processedFile1 = file_processor(file1);
         List<String> processedFile2 = file_processor(file2);
-        score = 0; // Resets score to 0
+        score = 0; //resets score
 
         // Find the top most common words in each file
         Map<String, Integer> topWordsFile1 = findTopWords(processedFile1);
         Map<String, Integer> topWordsFile2 = findTopWords(processedFile2);
+        
+        writeTopWordsToFile("topWordsFile1.txt", topWordsFile1);
+        writeTopWordsToFile("topWordsFile2.txt", topWordsFile2);
         
         // Compare the sets of top most common words and calculate score.
         int score = compareTopWords(topWordsFile1, topWordsFile2);
@@ -271,6 +265,7 @@ public class TopicModelerGUI extends JFrame {
         return score;
     }
     
+    // https://stackoverflow.com/questions/65633941/how-to-list-the-top-n-frequent-words-in-a-string-array-in-java
     private Map<String, Integer> findTopWords(List<String> words) {
         Map<String, Integer> wordFrequency = new HashMap<>();
         
@@ -286,10 +281,10 @@ public class TopicModelerGUI extends JFrame {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
                         (oldValue, newValue) -> oldValue, LinkedHashMap::new));
         
-        // Extract the top most common words limited by a user-defined slider
+        // Extract the top most common words
         Map<String, Integer> topWords = new LinkedHashMap<>();
         int count = 0;
-        int topCommonWords = slider.getValue(); //slider adjusts the amount of words which will be considered
+        int topCommonWords = slider.getValue();
         for (Map.Entry<String, Integer> entry : sortedWordFrequency.entrySet()) {
             if (count >= topCommonWords) {
                 break;
@@ -300,7 +295,6 @@ public class TopicModelerGUI extends JFrame {
         
         return topWords;
     }
-
 
     private int compareTopWords(Map<String, Integer> topWordsFile1, Map<String, Integer> topWordsFile2) {
         int score = 0;
@@ -315,7 +309,6 @@ public class TopicModelerGUI extends JFrame {
         return score;
     }
     
-    // Extracts words from a file excludig words that are stopwords
     public List<String> file_processor(String filename) {
 		 File file = new File(filename);
 		this.Stopwords = new File("StopWords.txt");
@@ -328,8 +321,6 @@ public class TopicModelerGUI extends JFrame {
 				String stopword = scanStopwords.nextLine().trim().toLowerCase();
 				stopwords.add(stopword);
 			}
-
-            // Read each word from the main file and clean it then compare it against stopwords
 			while(scan.hasNextLine()) {
 				String line = scan.nextLine();
 				String[] lineToWords = line.split("\\s+");
@@ -356,11 +347,21 @@ public class TopicModelerGUI extends JFrame {
 		return words;
 	} 
     
+    // https://stackoverflow.com/questions/37527177/writing-hashmap-contents-to-the-file
+    private void writeTopWordsToFile(String filename, Map<String, Integer> topWords) {
+    	
+        try {
+            List<String> lines = topWords.entrySet().stream().map(entry -> entry.getKey() + " : " + entry.getValue()).collect(Collectors.toList());
+            Files.write(Paths.get(filename), lines);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
     public List<String> getWords(){
 		return words;
 	}
 	public File getStopwords() {
 		return Stopwords;
 	}
-
 }
